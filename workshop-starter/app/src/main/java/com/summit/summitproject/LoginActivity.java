@@ -11,7 +11,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.summit.summitproject.prebuilt.login.LoginListener;
 import com.summit.summitproject.prebuilt.login.LoginManager;
+import com.summit.summitproject.prebuilt.model.Transaction;
+
+import java.util.ArrayList;
 
 /**
  * The first screen of our app. Takes in a username and password and interacts with the
@@ -50,17 +54,32 @@ public class LoginActivity extends AppCompatActivity {
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "Login Clicked!", Toast.LENGTH_LONG).show();
                 progressBar.setVisibility(View.VISIBLE);
+
+                String inputedUsername = username.getText().toString().trim();
+                String inputedPassword = password.getText().toString().trim();
+                LoginManager loginManager = new LoginManager(inputedUsername, inputedPassword, new LoginListener() {
+                    @Override
+                    public void onLoginSuccess(String name, String cardNum, ArrayList<Transaction> transactions) {
+                        Toast.makeText(LoginActivity.this, "Login Success!", Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onLoginError(Exception exception) {
+                        Toast.makeText(LoginActivity.this, "Login Failed!", Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+
+                loginManager.execute();
             }
         });
     }
 
     private TextWatcher textWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
